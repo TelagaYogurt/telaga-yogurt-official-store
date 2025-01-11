@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TELAGA YOGURT</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .product img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+
+      .admin-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: transparent;
+        border: none;
+        color: #ff7f50;
+        cursor: pointer;
+        font-size: 14px;
+        transition: color 0.3s;
+      }
+
+      .admin-button:hover {
+        color: #2ae7ee;
+      }
+
+      .admin-login {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 10px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        z-index: 1000;
+      }
+
+      .admin-login input {
+        padding: 5px;
+        margin-bottom: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: calc(100% - 12px);
+      }
+
+      .admin-login button {
+        background-color: #41c3ff;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .admin-login button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <h1>TELAGA YOGURT</h1>
+      <button class="admin-button" onclick="showAdminLogin()">Admin</button>
+      <div class="admin-login" id="admin-login">
+        <input type="password" id="admin-password" placeholder="Password" />
+        <button onclick="authenticateAdmin()">Login</button>
+      </div>
+    </div>
+    <div class="nav">
+      <a href="index.html">Beranda</a>
+      <a href="shop.html">Belanja</a>
+      <a href="account.html">Akun Saya</a>
+      <a href="cart.html">Keranjang</a>
+      <a href="login.html">Login</a>
+      <a href="outlets.html">Outlet Kami</a>
+    </div>
+    <div class="center">
+      <h4>Selamat Datang di TOKO ONLINE KAMI!</h4>
+      <p>Temukan yogurt lezat dan sehat kami.</p>
+      <h2>Ini adalah produk unggulan kami:</h2>
+      <div class="products" id="products">
+        <!-- Produk unggulan akan ditampilkan di sini -->
+      </div>
+    </div>
+    <div class="footer">
+      <p>&copy; 2025 TELAGA YOGURT. Hak Cipta Dilindungi.</p>
+    </div>
+    <script>
+      function loadProducts() {
+        const products = [
+          {
+            flavor: "Stroberi",
+            name: "Yogurt Stroberi",
+            price: 6000,
+            image: "yogurt rasa stroberi.jpg",
+          },
+          {
+            flavor: "Leci",
+            name: "Yogurt Leci",
+            price: 6000,
+            image: "yogurt rasa leci.jpg",
+          },
+        ];
+
+        const productContainer = document.getElementById("products");
+        productContainer.innerHTML = "";
+
+        products.forEach((product) => {
+          const productElement = document.createElement("div");
+          productElement.className = "product";
+          productElement.style.backgroundColor = getProductColor(
+            product.flavor
+          );
+          productElement.innerHTML = `
+                    <img src="${product.image}" alt="Yogurt ${product.flavor}">
+                    <h3>Yogurt ${product.flavor}</h3>
+                    <p>Harga: Rp ${product.price}</p>
+                    <button onclick="addToCart('${product.name}', ${product.price})">Tambah ke Keranjang</button>
+                `;
+          productContainer.appendChild(productElement);
+        });
+      }
+
+      function getProductColor(flavor) {
+        switch (flavor) {
+          case "Stroberi":
+            return "#ffcccc";
+          case "Leci":
+            return "#e6ffe6";
+          default:
+            return "#fff";
+        }
+      }
+
+      function addToCart(name, price) {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        cart.push({
+          name,
+          price,
+        });
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(name + " telah ditambahkan ke keranjang.");
+      }
+
+      function showAdminLogin() {
+        const adminLogin = document.getElementById("admin-login");
+        adminLogin.style.display = "block";
+      }
+
+      function authenticateAdmin() {
+        const password = document.getElementById("admin-password").value;
+        if (password === "adminyogurt321") {
+          window.location.href = "admin.html";
+        } else {
+          alert("Password salah.");
+          document.getElementById("admin-login").style.display = "none";
+        }
+      }
+
+      window.onload = function () {
+        loadProducts();
+        setTitleImage();
+      };
+
+      function setTitleImage() {
+        const link = document.createElement("link");
+        link.rel = "icon";
+        link.href = "favicon.ico";
+        document.head.appendChild(link);
+      }
+    </script>
+  </body>
+</html>

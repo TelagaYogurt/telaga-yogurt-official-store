@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Admin - Toko Yogurt</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .admin-container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .admin-header {
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .admin-header h2 {
+        color: #007bff;
+        margin: 0;
+      }
+
+      .admin-content {
+        margin-bottom: 20px;
+      }
+
+      .admin-content h3 {
+        color: #007bff;
+        margin-bottom: 10px;
+      }
+
+      .admin-content p {
+        color: #666;
+      }
+
+      .admin-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .admin-form label {
+        color: #333;
+      }
+
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .admin-form button {
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        padding: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+
+      .admin-form button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <h1>Panel Admin</h1>
+    </div>
+    <div class="nav">
+      <a href="index.html">Beranda</a>
+      <a href="shop.html">Belanja</a>
+      <a href="account.html">Akun Saya</a>
+      <a href="cart.html">Keranjang</a>
+      <a href="login.html">Login</a>
+      <a href="admin.html">Admin</a>
+    </div>
+    <div class="main">
+      <div class="admin-container">
+        <div class="admin-header">
+          <h2>Dashboard Admin</h2>
+        </div>
+        <div class="admin-content">
+          <h3>Kelola Produk</h3>
+          <form class="admin-form" id="product-form">
+            <label for="product-name">Nama Produk:</label>
+            <input type="text" id="product-name" name="product-name" required />
+            <label for="product-price">Harga Produk:</label>
+            <input
+              type="number"
+              id="product-price"
+              name="product-price"
+              required
+            />
+            <label for="product-image">Gambar Produk:</label>
+            <input
+              type="file"
+              id="product-image"
+              name="product-image"
+              required
+            />
+            <label for="product-flavor">Rasa Produk:</label>
+            <input
+              type="text"
+              id="product-flavor"
+              name="product-flavor"
+              required
+            />
+            <button type="button" onclick="addProduct()">Tambah Produk</button>
+          </form>
+          <div id="product-list">
+            <!-- Daftar produk akan dimuat di sini -->
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <p>&copy; 2025 Toko Yogurt. Hak Cipta Dilindungi.</p>
+      </div>
+    </div>
+    <script>
+      let products = JSON.parse(localStorage.getItem("products")) || [];
+
+      function saveProductsToLocalStorage() {
+        localStorage.setItem("products", JSON.stringify(products));
+      }
+
+      function loadProducts() {
+        const productList = document.getElementById("product-list");
+        productList.innerHTML = "";
+
+        products.forEach((product, index) => {
+          const productElement = document.createElement("div");
+          productElement.className = "product";
+          productElement.innerHTML = `
+            <h4>${product.name}</h4>
+            <p>Harga: Rp ${product.price}</p>
+            <p>Rasa: ${product.flavor}</p>
+            <img src="${product.image}" alt="Yogurt ${product.flavor}" style="max-width: 100px;">
+            <button onclick="editProduct(${index})">Edit</button>
+            <button onclick="deleteProduct(${index})">Hapus</button>
+          `;
+          productList.appendChild(productElement);
+        });
+      }
+
+      function addProduct() {
+        const name = document.getElementById("product-name").value;
+        const price = document.getElementById("product-price").value;
+        const flavor = document.getElementById("product-flavor").value;
+        const imageInput = document.getElementById("product-image");
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const image = e.target.result;
+
+          const newProduct = {
+            name,
+            price,
+            image,
+            flavor,
+          };
+
+          products.push(newProduct);
+          alert("Produk berhasil ditambahkan!");
+          loadProducts();
+          document.getElementById("product-form").reset();
+          saveProductsToLocalStorage();
+        };
+
+        reader.readAsDataURL(imageInput.files[0]);
+      }
+
+      function editProduct(index) {
+        const product = products[index];
+        document.getElementById("product-name").value = product.name;
+        document.getElementById("product-price").value = product.price;
+        document.getElementById("product-image").value = ""; // Kosongkan input file untuk memuat ulang gambar
+        document.getElementById("product-flavor").value = product.flavor;
+
+        const saveButton = document.createElement("button");
+        saveButton.textContent = "Simpan Perubahan";
+        saveButton.onclick = function () {
+          updateProduct(index);
+        };
+
+        const form = document.getElementById("product-form");
+        form.appendChild(saveButton);
+      }
+
+      function updateProduct(index) {
+        const name = document.getElementById("product-name").value;
+        const price = document.getElementById("product-price").value;
+        const flavor = document.getElementById("product-flavor").value;
+        const imageInput = document.getElementById("product-image");
+
+        if (imageInput.files.length > 0) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            const image = e.target.result;
+
+            products[index] = {
+              name,
+              price,
+              image,
+              flavor,
+            };
+
+            alert("Produk berhasil diperbarui!");
+            loadProducts();
+            document.getElementById("product-form").reset();
+            const saveButton = document.querySelector(
+              'button[textContent="Simpan Perubahan"]'
+            );
+            if (saveButton) saveButton.remove();
+            saveProductsToLocalStorage();
+          };
+
+          reader.readAsDataURL(imageInput.files[0]);
+        } else {
+          products[index] = {
+            name,
+            price,
+            image: products[index].image, // Pertahankan gambar yang ada jika tidak diperbarui
+            flavor,
+          };
+
+          alert("Produk berhasil diperbarui!");
+          loadProducts();
+          document.getElementById("product-form").reset();
+          const saveButton = document.querySelector(
+            'button[textContent="Simpan Perubahan"]'
+          );
+          if (saveButton) saveButton.remove();
+          saveProductsToLocalStorage();
+        }
+      }
+
+      function deleteProduct(index) {
+        products.splice(index, 1);
+        alert("Produk berhasil dihapus!");
+        loadProducts();
+        saveProductsToLocalStorage();
+      }
+
+      window.onload = function () {
+        loadProducts();
+      };
+    </script>
+  </body>
+</html>
